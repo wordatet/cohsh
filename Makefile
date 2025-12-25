@@ -1,9 +1,11 @@
 # Makefile for Coherent Shell Port
 # Compatible with GNU Make and BSD Make
 
-CC?= 		 gcc
-CFLAGS+= 	-O2 -Wall -Wno-pointer-sign -I. -DDIRECTORY_STACK=1
-YACC?= 		 yacc
+CC?= 		gcc
+
+CFLAGS+= 	-O0 -Wall -Wno-pointer-sign -std=gnu89 -I. -DDIRECTORY_STACK=1
+
+YACC?= 		yacc
 
 VERSION?= 	 "V4.2.2"
 

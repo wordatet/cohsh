@@ -8,9 +8,9 @@
  * Externals.
  */
 
-BUF	* bufap = NULL;			/* Head of allocation list */
-BUF	* buffp = NULL;			/* Tail of free list */
-BUF	** bufapp = & bufap;		/* Tail of allocation list */
+BUF     * bufap = NULL;                 /* Head of allocation list */
+BUF     * buffp = NULL;                 /* Tail of free list */
+BUF     ** bufapp = & bufap;            /* Tail of allocation list */
 
 
 /*
@@ -20,9 +20,10 @@ BUF	** bufapp = & bufap;		/* Tail of allocation list */
 
 char *
 duplstr (cp, f)
-char	      *	cp;
+char          * cp;
+int f;
 {
-	return strcpy ((* (f ? salloc : balloc)) (strlen (cp) + 1), cp);
+        return strcpy ((* (f ? salloc : balloc)) (strlen (cp) + 1), cp);
 }
 
 
@@ -30,26 +31,26 @@ char	      *	cp;
  * Similar to the above, only we are duplicating a counted string.
  */
 
-#if	USE_PROTO
+#if     USE_PROTO
 CSTRING * dupcstr (CSTRING * cstrp, int f)
 #else
 CSTRING *
 dupcstr (cstrp, f)
-CSTRING	      *	cstrp;
-int		f;
+CSTRING       * cstrp;
+int             f;
 #endif
 {
-	CSTRING	      *	temp;
-	temp = memcpy ((* (f ? salloc : balloc)) (CSTRING_SIZE (cstrp) + 1),
-		       cstrp, CSTRING_SIZE (cstrp));
+        CSTRING       * temp;
+        temp = memcpy ((* (f ? salloc : balloc)) (CSTRING_SIZE (cstrp) + 1),
+                       cstrp, CSTRING_SIZE (cstrp));
 
-	/*
-	 * Add an extra character, because most users of counted strings do
-	 * eventually want to use a C-style string.
-	 */
+        /*
+         * Add an extra character, because most users of counted strings do
+         * eventually want to use a C-style string.
+         */
 
-	CSTRING_STRING (temp) [CSTRING_LENGTH (temp)] = 0;
-	return temp;
+        CSTRING_STRING (temp) [CSTRING_LENGTH (temp)] = 0;
+        return temp;
 }
 
 
@@ -59,13 +60,13 @@ int		f;
 char **
 makargl ()
 {
-	register char ** app;
+        register char ** app;
 
-	app = (char **) balloc ((1 + IALSIZE) * sizeof (char *));
-	app ++;
-	app [-1] = (char *) IALSIZE;
-	app [0] = NULL;
-	return app;
+        app = (char **) balloc ((1 + IALSIZE) * sizeof (char *));
+        app ++;
+        app [-1] = (char *) (size_t) IALSIZE;
+        app [0] = NULL;
+        return app;
 }
 
 /*
@@ -75,33 +76,33 @@ makargl ()
 
 char **
 addargl (app, sp, cstr)
-char	     **	app;
-VOID	      *	sp;
-int		cstr;	/* non-zero if argument is a counted string */
+char         ** app;
+VOID          * sp;
+int             cstr;   /* non-zero if argument is a counted string */
 {
-	char ** napp;
-	register char ** rapp;
-	register unsigned n, i;
+        char ** napp;
+        register char ** rapp;
+        register size_t n, i;
 
-	rapp = app;
-	n = (int) rapp [-1];
-	while (* rapp ++ != NULL)
-		;
-	if (rapp - app >= n) {
-		napp = (char **) balloc ((1 + n * 2) * sizeof (char *));
-		napp ++;
-		napp [-1] = (char *) (n * 2);
-		for (i = 0; i < n; i ++)
-			napp [i] = app [i];
-		rapp = (app = napp) + n;
-	}
-	* rapp = NULL;
-	if (cstr) {
-		CSTRING	      *	cstrp = dupcstr (sp, 0);
-		rapp [-1] = CSTRING_STRING (sp);
-	} else
-		rapp [-1] = duplstr (sp, 0);
-	return app;
+        rapp = app;
+        n = (size_t) rapp [-1];
+        while (* rapp ++ != NULL)
+                ;
+        if (rapp - app >= n) {
+                napp = (char **) balloc ((1 + n * 2) * sizeof (char *));
+                napp ++;
+                napp [-1] = (char *) (size_t) (n * 2);
+                for (i = 0; i < n; i ++)
+                        napp [i] = app [i];
+                rapp = (app = napp) + n;
+        }
+        * rapp = NULL;
+        if (cstr) {
+                rapp [-1] = (char *)CSTRING_STRING (sp);
+        } else {
+                rapp [-1] = duplstr (sp, 0);
+        }
+        return app;
 }
 
 /*
@@ -110,20 +111,21 @@ int		cstr;	/* non-zero if argument is a counted string */
 BUF **
 savebuf ()
 {
-	return bufapp;
+        return bufapp;
 }
 
 /*
  * Free everything allocated since passed allocation position
  * was saved.
  */
+void
 freebuf (bpp)
 BUF ** bpp;
 {
-	* bufapp = buffp;
-	buffp = * bpp;
-	* bpp = NULL;
-	bufapp = bpp;
+        * bufapp = buffp;
+        buffp = * bpp;
+        * bpp = NULL;
+        bufapp = bpp;
 }
 
 /*
@@ -132,26 +134,27 @@ BUF ** bpp;
  */
 char *
 balloc (n)
+int n;
 {
-	register BUF * bp, ** bpp;
+        register BUF * bp, ** bpp;
 
-	bpp = & buffp;
-	for (;;) {
-		if ((bp = * bpp) == NULL) {
-			bp = (BUF *) salloc (sizeof (BUF) + n);
-			bp->b_size = n;
-			break;
-		}
-		if (bp->b_size == n) {
-			* bpp = bp->b_next;
-			break;
-		}
-		bpp = & bp->b_next;
-	}
-	* bufapp = bp;
-	bufapp = & bp->b_next;
-	* bufapp = NULL;
-	return (char *) bp + sizeof (BUF);
+        bpp = & buffp;
+        for (;;) {
+                if ((bp = * bpp) == NULL) {
+                        bp = (BUF *) salloc (sizeof (BUF) + n);
+                        bp->b_size = n;
+                        break;
+                }
+                if (bp->b_size == n) {
+                        * bpp = bp->b_next;
+                        break;
+                }
+                bpp = & bp->b_next;
+        }
+        * bufapp = bp;
+        bufapp = & bp->b_next;
+        * bufapp = NULL;
+        return (char *) bp + sizeof (BUF);
 }
 
 /*
@@ -160,31 +163,32 @@ balloc (n)
 
 char *
 salloc (n)
+int n;
 {
-	char	      *	cp;
+        char          * cp;
 
-	if ((cp = malloc (n)) == NULL) {
-		if (shellerr_begin ("Out of memory"))
-			shellerr_endl ();
+        if ((cp = malloc (n)) == NULL) {
+                if (shellerr_begin ("Out of memory"))
+                        shellerr_endl ();
 
-		reset (RNOSBRK);
-	}
+                reset (RNOSBRK);
+        }
 
-	return cp;
+        return cp;
 }
 
 /*
  * Free something allocated by 'salloc'.
  */
 
-#ifndef	sfree
+#ifndef sfree
 void
 sfree (cp)
 VOID * cp;
 {
-	if (cp == NULL)
-		abort ();
-	free (cp);
+        if (cp == NULL)
+                abort ();
+        free (cp);
 }
 #endif
 
@@ -193,45 +197,45 @@ VOID * cp;
  * Deallocate a vector.
  */
 
-#if	USE_PROTO
+#if     USE_PROTO
 void vfree (char * CONST * vecp, int extra)
 #else
 void
 vfree (vecp, extra)
-char  * CONST *	vecp;
-int		extra;
+char  * CONST * vecp;
+int             extra;
 #endif
 {
-	char  * CONST *	vpp;
+        char  * CONST * vpp;
 
-	if (vecp == NULL)
-		return;
+        if (vecp == NULL)
+                return;
 
-	for (vpp = vecp + extra ; * vpp != NULL ; vpp += 1)
-		sfree (* vpp);
-	sfree ((VOID *) vecp);
+        for (vpp = vecp + extra ; * vpp != NULL ; vpp += 1)
+                sfree (* vpp);
+        sfree ((VOID *) vecp);
 }
 
 
-#if	USE_PROTO
+#if     USE_PROTO
 char ** vdupl (char * CONST * vecp, int extra)
 #else
 char **
 vdupl (vecp, extra)
-char  * CONST *	vecp;
-int		extra;
+char  * CONST * vecp;
+int             extra;
 #endif
 {
-	char  * CONST *	vp;
-	char ** nvp, ** tvp;
+        char  * CONST * vp;
+        char ** nvp, ** tvp;
 
-	for (vp = vecp ; * vp ++ != NULL ;)
-		/* DO NOTHING */ ;
-	tvp = nvp = (char **) salloc ((vp - vecp + extra) * sizeof (* vp));
-	tvp += extra;
-	for (vp = vecp ; * vp != NULL ; )
-		* tvp ++ = duplstr (* vp ++, 1);
-	* tvp = NULL;
+        for (vp = vecp ; * vp ++ != NULL ;)
+                /* DO NOTHING */ ;
+        tvp = nvp = (char **) salloc ((vp - vecp + extra) * sizeof (* vp));
+        tvp += extra;
+        for (vp = vecp ; * vp != NULL ; )
+                * tvp ++ = duplstr (* vp ++, 1);
+        * tvp = NULL;
 
-	return nvp;
+        return nvp;
 }

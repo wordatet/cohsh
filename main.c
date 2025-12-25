@@ -170,6 +170,7 @@ SES	      *	session;
 
 	session->s_argv [0] = tmp;
 	session->s_count = 0;
+	return 0;
 }
 
 
@@ -272,7 +273,7 @@ SES	      *	session;
 
 	case SSTR:
 		session->s_strp = NULL;
-		session->s_ifd = (int) info;
+		session->s_ifd = (int)(intptr_t) info;
 		session->s_flag = isatty (session->s_ifd) &&
 				  isatty (STDERR_FILENO) ? INTERACTIVE : 0;
 		buffer_session (session);
@@ -781,7 +782,7 @@ CONST char * vps;
 	 */
 
 	lex_push ();
-	push_session (SARGS, vps, & s);
+	push_session (SARGS, (void *) vps, & s);
 
 	for (;;) {
 		int		c;

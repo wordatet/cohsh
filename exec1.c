@@ -321,7 +321,7 @@ int		flags;
 	int		not_flag = 0;	/* for '!' in pipelines */
 
 	if (ret_done)
-		return;
+		return slret;
 	innp = NULL;
 	inlp = NULL;
 	cnode = NULL;

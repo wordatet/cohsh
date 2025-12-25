@@ -71,7 +71,7 @@ int	      *	cflag;
 	if ((retval = malloc (strlen (src) + 1)) == NULL) {
 		fprintf (stderr,
 			 "printf: cannot allocate memory for argument \"%s\"\n",
-			 temp);
+			 src);
 		return NULL;
 	}
 
@@ -121,6 +121,7 @@ int	      *	cflag;
 			continue;
 		}
 	}
+	return retval;
 }
 
 
@@ -169,7 +170,7 @@ char	     **	argv;
 		char	      *	number_message;
 		char	      *	radix_string;
 		char		sign_char;
-		unsigned	radix;
+		unsigned	radix = 10;
 
 		if ((ch = * work ++) == 0) {
 			/*

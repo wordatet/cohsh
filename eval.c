@@ -155,6 +155,7 @@ int		f;
 				 CSTRING_LENGTH (nodep->n_cstrp), f);
 	default:
 		panic (14);
+		return NULL;
 	}
 }
 
@@ -255,7 +256,7 @@ int u2;
 	 * input.
 	 */
 
-	if (push_session (SSTR, u2, & s) != 0)
+	if (push_session (SSTR, (void *)(intptr_t)u2, & s) != 0)
 		return -1;
 
 	for (;;) {
@@ -618,7 +619,7 @@ int		slashmode;
 
 	for (;;) {
 		size_t		len = strlen (evalp->e_inbuf);
-		int		endchar;
+		int		endchar = 0;
 		char		c = 0;
 
 		while (len --) {

@@ -328,6 +328,7 @@ s_dirs ()
 		cmd_outchar (' ');
 	}
 	cmd_endl ();
+	return 0;
 }
 
 
@@ -532,6 +533,7 @@ s_exit ()
 	if (nargc > 1)
 		slret = strtol (nargv [1], NULL, 0);
 	reset (RUEXITS);
+	return 0;
 }
 
 

@@ -63,6 +63,7 @@ char ** cpp1, ** cpp2;
  * Initial glob driver, set up initial directory name, pattern, and
  * suffix; call glob2; sort the results.
  */
+int
 glob1(args)
 char * args;
 {
@@ -106,6 +107,7 @@ char * args;
 	}
 }
 
+int
 glob2(patt, nsep, suff)
 char * patt, * suff;
 int nsep;
@@ -161,12 +163,14 @@ int nsep;
 			* -- nsuff = '/';
 		dirname [dirp] = 0;
 	}
+	return 0;
 }
 
 /*
  * See if a pattern matches a string.
  * '\' escapes the next character.
  */
+int
 match (pp, sp)
 register char * pp;
 register char * sp;
@@ -267,6 +271,7 @@ char * name;
 	return np;
 }
 
+int
 mksep (cp, ns)
 char * cp;
 int ns;
@@ -276,18 +281,22 @@ int ns;
 	while (ns-- > 0)
 		* cp ++ = '/';
 	* cp = 0;
+	return 0;
 }
 
+int
 newarg (p)
 char * p;
 {
 	nargc += 1;
 	nargv = addargl (nargv, p, 0);
+	return 0;
 }
 
 /*
  * get rid of the glob escapes.
  */
+int
 strip (s)
 register char * s;
 {

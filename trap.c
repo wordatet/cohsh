@@ -85,9 +85,9 @@ int		signo;
 void
 deftrp (sig, def)
 int sig;
-int (*def)();
+void (*def)();
 {
-	sigset (sig, def);
+	sigset (sig, (void (*)(int))def);
 	trap [sig].t_cnt = 0;
 	trap [sig].t_set = def;
 	trap [sig].t_def = def;
@@ -187,6 +187,7 @@ int		context;
  * Show the contents of traps.
  */
 
+int
 telltrp ()
 {
 	int sig;
@@ -300,6 +301,7 @@ unsigned int	sig;
 
 int
 recover (context)
+int		context;
 {
 	int		sig;
 	char	      *	actp;

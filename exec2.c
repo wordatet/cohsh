@@ -331,9 +331,9 @@ REDIR_UNDO ** undo;
 {
 	char	     **	iopp;
 	char	      *	io;
-	enum redir_op	op;
+	enum redir_op	op = REDIR_IN;
 	int		u1;
-	int		u2;
+	int		u2 = 0;
 
 	for (iopp = iovp ; (io = * iopp ++) != NULL; ) {
 
