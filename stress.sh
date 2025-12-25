@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bi./cohsh
 
 # Paranoid Stress Test for uwsh
 # Verification of core shell functionality after porting.

@@ -19,7 +19,7 @@
 typedef	int		stream_t;
 
 
-#define	COMMAND_NAME	"sh"
+#define	COMMAND_NAME	"cohsh"
 #define	NUM_BUF_SIZE	64
 
 

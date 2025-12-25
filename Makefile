@@ -15,10 +15,10 @@ OBJ= 	 alloc.o eval.o exec1.o exec2.o exec3.o extern.o \
 SRCS=	 sh.h sh_port.h parse.y alloc.c eval.c exec1.c exec2.c exec3.c \
 	 extern.c glob.c lex.c main.c tab.c trap.c var.c buildobj.c io.c
 
-all: sh printf
+all: cohsh printf
 
-sh: $(OBJ)
-	$(CC) $(CFLAGS) -o sh $(OBJ) $(LDFLAGS)
+cohsh: $(OBJ)
+	$(CC) $(CFLAGS) -o cohsh $(OBJ) $(LDFLAGS)
 
 printf: printf.o
 	$(CC) $(CFLAGS) -o printf printf.o $(LDFLAGS)
@@ -48,4 +48,4 @@ io.o:		sh.h sh_port.h shellio.h io.c
 printf.o:	sh_port.h printf.c
 
 clean:
-	rm -f $(OBJ) sh printf y.tab.h parse.c printf.o y.tab.c
+	rm -f $(OBJ) cohsh printf y.tab.h parse.c printf.o y.tab.c
