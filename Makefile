@@ -3,7 +3,12 @@
 
 CC?= 		gcc
 
-CFLAGS+= 	-O0 -Wall -Wno-pointer-sign -std=gnu89 -I. -DDIRECTORY_STACK=1
+CFLAGS+= 	-g -O0 -Wall -Wno-pointer-sign -std=gnu89 -I. -DDIRECTORY_STACK=1
+
+ifeq ($(ASAN),1)
+CFLAGS+= 	-fsanitize=address
+LDFLAGS+= 	-fsanitize=address
+endif
 
 YACC?= 		yacc
 

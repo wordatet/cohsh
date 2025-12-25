@@ -35,9 +35,9 @@ CONST char   **	diag;
 	}
 
 	errno = 0;
-	* number = strtol (str, diag, 0);
+	* number = strtol (str, (char **)diag, 0);
 	if (errno == ERANGE)
-		* number = strtoul (str, diag, 0);
+		* number = strtoul (str, (char **)diag, 0);
 	if (errno == ERANGE) {
 		* diag = "arithmetic overflow";
 		return;
@@ -167,7 +167,7 @@ char	     **	argv;
 		int		flags;
 		char		buf [sizeof (unsigned long) * 3 + 1];
 		char	      *	bufptr;
-		char	      *	number_message;
+		CONST char    *	number_message;
 		char	      *	radix_string;
 		char		sign_char;
 		unsigned	radix = 10;

@@ -4,6 +4,7 @@
  */
 
 #include <stdlib.h>
+#include <fcntl.h>
 
 #include "shellio.h"
 #include "sh.h"
@@ -558,6 +559,7 @@ void read_here () {
 	}
 }
 
+int
 isnext (c, newtok, oldtok)
 int	c;
 int	newtok;
@@ -608,7 +610,7 @@ end_substring (string_start)
 size_t		string_start;
 {
 	char	      *	where;
-	int		abort;
+	/* int		abort; */
 	size_t		length;
 
 	lex_unadd ();
@@ -996,6 +998,7 @@ enum {
 	READ_HERE_TAB		/* <<-' */
 };
 
+int
 lexiors (c1)
 int		c1;
 {
@@ -1151,7 +1154,6 @@ int f;
 	int		c;
 
 	while ((c = getn ()) != ec) {
-backslashed:
 		/*
 		 * NIGEL: Originally, this routine complained about missing
 		 * characters at EOF, but System V just implicitly closes off
@@ -1266,7 +1268,6 @@ getn ()
 			shell_outchar (c);
 		return c;
 
-	default:
-		panic (23);
 	}
+	return LEX_EOF;
 }

@@ -96,7 +96,9 @@ char	     **	envp;
 		 * and we don't want to always start interpreting a binary!
 		 */
 
+#if 0
 		extern BUF * bufap;
+#endif
 		fakearg (1, argc = nargc, argv = nargv, envp = nenvp);
 	}
 
@@ -129,7 +131,7 @@ char	     **	envp;
 			return 1;
 		}
 		-- sargc;
-		session (SARGS, duplstr (* sargp ++, 1));
+		session (SARGS, duplstr (* sargp ++, 1), SESSION_FREE_STRP);
 	} else if (! sflag && ! iflag && sargc != 0) {
 static	int	sargdup;
 
@@ -139,9 +141,9 @@ static	int	sargdup;
 		-- sargc;
 		sargdup = 1;
 
-		session (SFILE, scmdp == NULL ? sarg0 : scmdp);
+		session (SFILE, scmdp == NULL ? sarg0 : scmdp, scmdp == NULL ? SESSION_FREE_STRP : 0);
 	} else
-		session (SSTR, STDIN_FILENO);
+		session (SSTR, (void*)(intptr_t)STDIN_FILENO, 0);
 
 	cleanup_shell_fns ();
 	unlink_temp (capture_temp ());
@@ -180,24 +182,24 @@ SES	      *	session;
  */
 
 #if	USE_PROTO
-int push_session (int type, VOID * info, SES * session)
-#else
 int
-push_session (type, info, session)
+push_session (type, info, session, flags)
 int		type;
 VOID	      *	info;
 SES	      *	session;
+int		flags;
 #endif
 {
 	int		scan;
 
 	session->s_bpp = savebuf ();
 	session->s_line = 1;
+	session->s_base = NULL;
 
 	switch (session->s_type = type) {
 	case SARGS:
-		session->s_strp = (char *) info;
-		session->s_flag = 0;
+		session->s_strp = session->s_base = (char *) info;
+		session->s_flag = flags;
 		break;
 
 	case SARGV:
@@ -208,7 +210,8 @@ SES	      *	session;
 		break;
 
 	case SFILE:
-		session->s_strp = (char *) info;
+		session->s_strp = session->s_base = (char *) info;
+		session->s_flag = flags;
 
 		/*
 		 * NIGEL: We should take steps to ensure that the file
@@ -272,10 +275,10 @@ SES	      *	session;
 		break;
 
 	case SSTR:
-		session->s_strp = NULL;
+		session->s_strp = session->s_base = NULL;
 		session->s_ifd = (int)(intptr_t) info;
-		session->s_flag = isatty (session->s_ifd) &&
-				  isatty (STDERR_FILENO) ? INTERACTIVE : 0;
+		session->s_flag = (isatty (session->s_ifd) &&
+				  isatty (STDERR_FILENO) ? INTERACTIVE : 0) | flags;
 		buffer_session (session);
 		break;
 	}
@@ -305,6 +308,11 @@ SES	      *	session;
 {
 /*	assert (sesp == session); */
 
+	if (session->s_flag & SESSION_FREE_STRP) {
+		if (session->s_base != NULL)
+			sfree (session->s_base);
+	}
+
 	if (session->s_type == SFILE || session->s_type == SSTR) {
 		/*
 		 * Discard space allocated for buffering after "returning"
@@ -325,6 +333,7 @@ SES	      *	session;
 
 	freebuf (session->s_bpp);
 	free_node (session->s_node, CLEAN);
+	session->s_node = NULL;
 
 	sesp = session->s_next;
 }
@@ -335,14 +344,15 @@ SES	      *	session;
  */
 
 int
-session (t, p)
+session (t, p, flags)
 int t;
-char * p;
+VOID * p;
+int flags;
 {
 	SES s;
 	int rcode;
 
-	if ((rcode = push_session (t, p, & s)) > 0)
+	if ((rcode = push_session (t, p, & s, flags)) > 0)
 		return rcode - 1;
 
 	if (s.s_next == NULL) {		/* Initial entry */
@@ -372,13 +382,13 @@ char * p;
 				 */
 				if ((file = ffind ("/etc", "profile",
 						   R_OK)) != NULL)
-					session (SFILE, duplstr (file, 0));
+					session (SFILE, duplstr (file, 0), SESSION_FREE_STRP);
 				recover (IPROF);
 
 				lgnflag = 0;
 				if (* vhome && (file = ffind (vhome, ".profile",
 							      R_OK)) != NULL)
-					session (SFILE, duplstr (file, 0));
+					session (SFILE, duplstr (file, 0), SESSION_FREE_STRP);
 				break;
 #if	LOGINHACK
 			case 2:
@@ -391,7 +401,7 @@ char * p;
 
 				if ((file = ffind ("/etc", "profile",
 						   R_OK)) != NULL)
-					session (SFILE, duplstr (file, 0));
+					session (SFILE, duplstr (file, 0), SESSION_FREE_STRP);
 				recover (IPROF);
 				return exshell (findvar ("SHELL"));
 #endif
@@ -419,6 +429,7 @@ char * p;
 			recover (IRDY);
 			freebuf (s.s_bpp);
 			free_node (s.s_node, CLEAN);
+			s.s_node = NULL;
 			s.s_bpp = savebuf ();
 			if (yyparse () != 0)
 				syntax ("command syntax bad");
@@ -641,12 +652,9 @@ int i;
  *	not interactive.
  */
 
-#if	USE_PROTO
-LOCAL void print_vicinity (void)
-#else
+#if 0
 LOCAL void
 print_vicinity ()
-#endif
 {
 	if (sesp->s_type == SFILE) {
 		shellerr_outstr (sesp->s_strp);
@@ -661,6 +669,7 @@ print_vicinity ()
 	} else
 		shellerr_outstr ("sh: ");
 }
+#endif
 
 
 #if	USE_PROTO
@@ -754,7 +763,8 @@ CONST char    *	desc;
  */
 
 void
-yyerror()
+yyerror(s)
+CONST char * s;
 {
 }
 
@@ -782,7 +792,7 @@ CONST char * vps;
 	 */
 
 	lex_push ();
-	push_session (SARGS, (void *) vps, & s);
+	push_session (SARGS, (void *) vps, & s, 0);
 
 	for (;;) {
 		int		c;

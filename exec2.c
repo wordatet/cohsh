@@ -603,7 +603,7 @@ VAR *vp;
 		sargc = 0;
 		sargp = nargv + 2;
 		sarg0 = nargv [1];
-		return session (SFILE, vshell);
+		return session (SFILE, vshell, 0);
 	}
 	fprintf (stderr, "No shell: %s\n", vshell);
 	exit (1);

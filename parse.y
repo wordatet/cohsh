@@ -1,11 +1,11 @@
 %{
 #include "sh_port.h"
-#include "sh_port.h"
 
 #include "shellio.h"
 #include "sh.h"
 
-#define YYERROR	{ yyerrflag=1; goto YYerract; }
+int yylex PROTO ((void));
+void yyerror PROTO ((CONST char * s));
 
 static	NODE	      *	node ();
 static	NODE	      *	last_node ();
@@ -570,6 +570,7 @@ NODE	      *	nodep;
 static char keys[NKEY] = { 0 };
 static int  keyi = NKEY * NBPC;
 
+int
 keyflush()
 {
 	register char *kp;
@@ -577,8 +578,10 @@ keyflush()
 	for (kp = keys+NKEY; kp > keys; *--kp = 0)
 		;
 	keyi = NKEY * NBPC;
+	return 0;
 }
 
+int
 keypop()
 {
 	register char	*kp;
@@ -588,11 +591,14 @@ keypop()
 		panic (11);
 
 	kp = keys + (km / NBPC);
-	km = 1 << (km %= NBPC);
+	km %= NBPC;
+	km = 1 << km;
 	keyflag = (* kp & km) ? 1 : 0;
 	*kp &= ~km;
+	return 0;
 }
 
+int
 keypush()
 {
 	register char	*kp;
@@ -603,9 +609,11 @@ keypush()
 
 	if (keyflag) {
 		kp = keys + (km / NBPC);
-		km = 1 << (km %= NBPC);
+		km %= NBPC;
+		km = 1 << km;
 		* kp |= km;
 	}
+	return 0;
 }
 /*
  * The following fragments might implement named pipes.

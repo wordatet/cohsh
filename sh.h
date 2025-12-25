@@ -276,8 +276,9 @@ struct ses {
 	CON	      *	s_con;
 	BUF	     **	s_bpp;
 	jmp_buf		s_envl;
-	unsigned char *	s_strp;
-	unsigned char**	s_argv;
+	char *	s_strp;
+	char *	s_base;		/* original base of s_strp if it should be freed */
+	char **	s_argv;
 	int		s_ifd;
 	off_t		s_count;	/* characters in buffer */
 	int		s_line;		/* line number */
@@ -298,6 +299,7 @@ struct ses {
 #define	INTERACTIVE	1
 #define	SESSION_EOF	2
 #define	SESSION_EOL	4
+#define	SESSION_FREE_STRP 8
 
 
 /*
@@ -616,7 +618,7 @@ void		lex_push	PROTO ((void));
 void		lex_pop		PROTO ((void));
 
 int		push_session	PROTO ((int _type, VOID * _info,
-					SES * _session));
+					SES * _session, int _flags));
 
 int		special_builtin PROTO ((void));
 int		shell_builtin	PROTO ((void));

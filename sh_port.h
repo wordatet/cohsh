@@ -88,8 +88,8 @@ typedef struct redir_undo REDIR_UNDO;
 /* Forward Declarations of Internal Shell Functions */
 void panic(int i);
 int recover(int context);
-int session(int t, char *p);
-int push_session(int type, VOID *info, struct ses *session);
+int session(int t, VOID * p, int flags);
+int push_session(int type, VOID *info, struct ses *session, int flags);
 void pop_session(struct ses *session);
 int evalhere(int u2);
 int glob1(char *args);

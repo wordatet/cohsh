@@ -161,7 +161,7 @@ s_dot ()
 
 	push_arginfo (& info, nargc - 2, nargv [1], nargv + 2);
 
-	retval = session (SFILE, duplstr (file, 0));
+	retval = session (SFILE, duplstr (file, 0), SESSION_FREE_STRP);
 
 	pop_arginfo (& info);
 
@@ -489,7 +489,7 @@ LOCAL int
 s_eval ()
 #endif
 {
-	return nargc > 1 ? session (SARGV, ++ nargv) : 0;
+	return nargc > 1 ? session (SARGV, ++ nargv, 0) : 0;
 }
 
 
@@ -1289,10 +1289,14 @@ int		mode;
 	case STRP:
 		if (mode == DEALLOCATE)
 			sfree (np->n_strp);
+		else if (mode == CLEAN)
+			np->n_strp = NULL;
 		break;
 
 	case NODEP:
 		free_node (np->n_auxp, mode);
+		if (mode == CLEAN)
+			np->n_auxp = NULL;
 		break;
 
 	case NULLP:
@@ -1301,6 +1305,8 @@ int		mode;
 	case CSTRP:
 		if (mode == DEALLOCATE)
 			sfree (np->n_cstrp);
+		else if (mode == CLEAN)
+			np->n_cstrp = NULL;
 		break;
 
 	case FILEP:
@@ -1312,6 +1318,7 @@ int		mode;
 		case DEALLOCATE:
 		case CLEAN:
 			unlink_temp (np->n_filep);
+			np->n_filep = NULL;
 			break;
 		}
 		break;
@@ -1321,6 +1328,8 @@ int		mode;
 	}
 
 	free_node (np->n_next, mode);
+	if (mode == CLEAN)
+		np->n_next = NULL;
 
 	if (mode == DEALLOCATE)
 		sfree (np);

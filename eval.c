@@ -256,7 +256,7 @@ int u2;
 	 * input.
 	 */
 
-	if (push_session (SSTR, (void *)(intptr_t)u2, & s) != 0)
+	if (push_session (SSTR, (void *)(intptr_t)u2, & s, 0) != 0)
 		return -1;
 
 	for (;;) {
@@ -527,7 +527,7 @@ maked:
 
 		switch (len = EVAL_NEXT_CHAR (evalp)) {
 		case ':':
-			if (sp != NULL && * sp == NULL)
+			if (sp != NULL && * sp == '\0')
 				sp = NULL;
 			if ((len = EVAL_NEXT_CHAR (evalp)) != '+') {
 				EVAL_UNGET_CHAR (evalp, len);
@@ -693,7 +693,7 @@ int		slashmode;
 {
 	int pipev[2], f, oslret;
 	int nnl;
-	int		quotemode;
+	/* int		quotemode; */
 	char		ch;
 
 	/*
@@ -727,14 +727,14 @@ int		slashmode;
 		_eval->e_heap = NULL;
 		_eval->e_last = NULL;
 
-		exit (session (SARGS, temp));
+		exit (session (SARGS, temp, SESSION_FREE_STRP));
 	}
 	eval_pop (evalp);
 
 	close (pipev [1]);
 
 	nnl = 0;
-	quotemode = MNQUO;
+	/* quotemode = MNQUO; */
 
 	while (read (pipev [0], & ch, 1) == 1) {
 		if (! recover (IEVAL)) {
@@ -832,10 +832,10 @@ source_t	src;
 				CONST unsigned char   *	num = * src;
 				errno = 0;
 
-				tmp = strtol (num, src, 0);
+				tmp = strtol ((const char *)num, (char **)src, 0);
 
 				if (errno == ERANGE)
-					tmp = strtoul (num, src, 0);
+					tmp = strtoul ((const char *)num, (char **)src, 0);
 
 				while (isspace (** src))
 					(* src) ++;
@@ -1511,7 +1511,7 @@ eval_t	      *	evalp;
 
 		eval_pop (evalp);
 		alternate_value = temp = duplstr (alternate_value, 1);
-		while (c = * temp ++)
+		while ((c = * temp ++))
 			add_char (evalp, c);
 		sfree (alternate_value);
 	}

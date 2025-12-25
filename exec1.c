@@ -356,6 +356,7 @@ int		flags;
 	switch (np->n_type) {
 
 	case NFILE:		/* no effect on control flow */
+	case NPAIR:
 		continue;
 
 	case NCOMS:
@@ -391,14 +392,18 @@ int		flags;
 
 	case NWHILE:
 		/* do_done_list->n_next == this node */
-		if (command (np->n_auxp, COMMAND_TRUTH_CONTEXT))
+		if (command (np->n_auxp, COMMAND_TRUTH_CONTEXT)) {
+			slret = 0;
 			break;
+		}
 		continue;
 
 	case NUNTIL:
 		/* do_done_list->n_next == this node */
-		if (! command (np->n_auxp, COMMAND_TRUTH_CONTEXT))
+		if (! command (np->n_auxp, COMMAND_TRUTH_CONTEXT)) {
+			slret = 0;
 			break;
+		}
 		continue;
 
 	case NBRAC:

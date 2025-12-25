@@ -105,6 +105,7 @@ char * args;
 			newarg (args);
 		}
 	}
+	return 0;
 }
 
 int
@@ -305,11 +306,12 @@ register char * s;
 	p = s;
 	while (* s)
 		if ((* p = * s ++) == '\\')
-			if (* p ++ = * s ++)
+			if (((* p ++ = * s ++)))
 				continue;
 			else
 				break;
 		else
 			p ++;
 	* p = * s;
+	return 0;
 }

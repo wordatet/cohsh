@@ -102,12 +102,12 @@ static	struct {
 		char	      *	i_name;
 		CONST char   **	i_save;
 	} intsvals [] = {
-		"HOME",		& vhome,
-		"IFS",		& vifs,
-		"MAIL",		& vmail,
-		"PATH",		& vpath,
-		"PS1",		& vps1,
-		"PS2",		& vps2
+		{"HOME",		& vhome},
+		{"IFS",		& vifs},
+		{"MAIL",		& vmail},
+		{"PATH",		& vpath},
+		{"PS1",		& vps1},
+		{"PS2",		& vps2}
 	};
 #if	0
 static	struct {
@@ -217,25 +217,25 @@ char   **	envp;
 
 	} initvals [] = {
 
-		VAR_SETTER,	"IFS= \t\n",
+		{VAR_SETTER,	"IFS= \t\n"},
 
-		VAR_SETTER,	"PS2=> ",
+		{VAR_SETTER,	"PS2=> "},
 
-		VAR_SETTER,	"PS1=$ ",
+		{VAR_SETTER,	"PS1=$ "},
 
-		VAR_SETTER,	"MAIL=",
+		{VAR_SETTER,	"MAIL="},
 
-		VAR_SETTER,	"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+		{VAR_SETTER,	"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"},
 
-		VAR_SETTER,	"HOME=",
+		{VAR_SETTER,	"HOME="},
 
 #if	MAINTAIN_CWD
 
-		VAR_SETTER | VAR_EXPORT,	"CWD=",
+		{VAR_SETTER | VAR_EXPORT,	"CWD="},
 
 #endif
 
-		VAR_SETTER,	"SH_VERSION=" VERSION
+		{VAR_SETTER,	"SH_VERSION=" VERSION}
 
 #if	0
 
@@ -440,7 +440,7 @@ int		f;
 int		prompt;
 {
 	VAR * vp;
-	char ** evp;
+	/* char ** evp; */
 
 	for (vp = varp ; vp ; vp = vp->v_next) {
 		if (f != 0 && (vp->v_flag & f) == 0)
@@ -471,7 +471,7 @@ envlvar (envp)
 char ** envp;
 {
 	char ** enpp;
-	char ** oenvp;
+	/* char ** oenvp; */
 	VAR * vp;
 
 	for (vp = varp ; vp ; vp = vp->v_next) {

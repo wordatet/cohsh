@@ -337,11 +337,11 @@ int		context;
 
 #if	0
 				trap [sig].t_act = NULL;
-				session (SARGS, actp);
+				session (SARGS, actp, 0);
 				trap [sig].t_act = actp;
 				setstrp (sig, NULL);
 #else
-				session (SARGS, actp);
+				session (SARGS, actp, 0);
 				slret = oslret;
 #endif
 			}
