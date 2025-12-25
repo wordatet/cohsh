@@ -1,0 +1,32 @@
+HISTORICAL SOURCE CODE PRESERVATION NOTICE & LICENSE
+
+1. ORIGINAL CODE (Coherent)
+The core source code in this repository is derived from the Coherent Operating System 
+(Copyright (c) 1982, 1993 by Mark Williams Company).
+This code was released by the rights holders under the 3-Clause BSD License.
+The original BSD notice and disclaimers are preserved in the source headers.
+This repository is NOT affiliated with, endorsed by, or connected to the Mark Williams Company or its successors.
+
+2. PORTING MODIFICATIONS
+Copyright (c) 2025 Mario (@wordatet)
+
+The modifications, patches, and build scripts required to compile this software 
+on modern 64-bit systems are licensed under the GNU General Public License 
+as published by the Free Software Foundation, either version 3 of the License, 
+or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+See the GNU General Public License for more details.
+
+---
+
+GNU GENERAL PUBLIC LICENSE
+Version 3, 29 June 2007
+
+Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
+Everyone is permitted to copy and distribute verbatim copies
+of this license document, but changing it is not allowed.
+
+[Preamble and Standard GPLv3 Text follows...]
+(Full GPLv3 text omitted for brevity in this file, but available at https://www.gnu.org/licenses/gpl-3.0.txt)

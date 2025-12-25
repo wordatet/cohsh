@@ -1,0 +1,8 @@
+*.o
+sh
+printf
+parse.c
+y.tab.h
+y.tab.c
+halsh
+tripsh
